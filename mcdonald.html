@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Martin Shopping List</title>
+
+<style>
+:root{
+  --main:#4f46e5;
+  --bg:#f4f6ff;
+  --card:#ffffff;
+  --checked:#22c55e;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:system-ui,Segoe UI,Arial;
+  display:flex;
+  justify-content:center;
+  padding:15px;
+}
+
+.app{
+  width:100%;
+  max-width:420px;
+  background:var(--card);
+  border-radius:25px;
+  box-shadow:0 15px 40px rgba(0,0,0,.15);
+  overflow:hidden;
+}
+
+/* HEADER */
+header{
+  background:linear-gradient(135deg,var(--main),#3b82f6);
+  color:#fff;
+  padding:22px;
+  text-align:center;
+}
+
+header h1{margin:0;font-size:22px}
+header p{margin:5px 0 0;font-size:14px;opacity:.9}
+
+/* COLOR SWITCHER */
+.colors{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  padding:10px;
+}
+
+.color{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  cursor:pointer;
+}
+
+.c1{background:#4f46e5}
+.c2{background:#16a34a}
+.c3{background:#db2777}
+.c4{background:#ea580c}
+
+/* LIST */
+ul{
+  list-style:none;
+  margin:0;
+  padding:15px;
+}
+
+li{
+  background:#f1f5ff;
+  margin-bottom:10px;
+  padding:14px;
+  border-radius:14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  cursor:pointer;
+  transition:.3s;
+}
+
+li.checked{
+  background:#dcfce7;
+  text-decoration:line-through;
+  color:#065f46;
+}
+
+.tick{
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  border:2px solid var(--main);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-weight:bold;
+}
+
+li.checked .tick{
+  background:var(--checked);
+  color:#fff;
+  border:none;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  padding:12px;
+  font-size:12px;
+  opacity:.7;
+}
+
+/* POPUP */
+.popup{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+}
+
+.popup-box{
+  background:#fff;
+  padding:25px;
+  border-radius:20px;
+  text-align:center;
+  max-width:300px;
+  animation:pop .4s ease;
+}
+
+.popup-box h2{color:var(--main)}
+
+@keyframes pop{
+  from{transform:scale(.7);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+
+/* PRINT */
+@media print{
+  header,.colors,.tick,.popup{display:none}
+  body{background:#fff}
+  .app{box-shadow:none}
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+<header>
+  <h1>Martin’s Shopping List</h1>
+  <p>Grade 7 • 2026</p>
+</header>
+
+<div class="colors">
+  <div class="color c1" onclick="setColor('#4f46e5')"></div>
+  <div class="color c2" onclick="setColor('#16a34a')"></div>
+  <div class="color c3" onclick="setColor('#db2777')"></div>
+  <div class="color c4" onclick="setColor('#ea580c')"></div>
+</div>
+
+<ul id="list">
+  <li>Toothbrush <span class="tick">✓</span></li>
+  <li>Bathing Soaps (6) <span class="tick">✓</span></li>
+  <li>Washing Powder OMO (½ KG) <span class="tick">✓</span></li>
+  <li>Toothpaste <span class="tick">✓</span></li>
+  <li>Tissue Roll (6–8) <span class="tick">✓</span></li>
+  <li>Bar Soap (3) <span class="tick">✓</span></li>
+  <li>Body Oil <span class="tick">✓</span></li>
+  <li>Shoe Brush <span class="tick">✓</span></li>
+  <li>Shoe Polish <span class="tick">✓</span></li>
+  <li>Washer <span class="tick">✓</span></li>
+  <li>Slippers / Crocs <span class="tick">✓</span></li>
+  <li>Rubbers <span class="tick">✓</span></li>
+  <li>Comb <span class="tick">✓</span></li>
+</ul>
+
+<footer>© The Cat</footer>
+</div>
+
+<div class="popup" id="popup">
+  <div class="popup-box">
+    <h2>🎉 Thank You!</h2>
+    <p>
+      Thank you for buying my master  
+      <b>Martin Lutherking (The Cat)</b>  
+      shopping for school.  
+      <br><br>Bye 👋
+    </p>
+  </div>
+</div>
+
+<audio id="sound">
+  <source src="https://assets.mixkit.co/sfx/preview/mixkit-achievement-bell-600.mp3">
+</audio>
+
+<script>
+const items=document.querySelectorAll("li");
+const popup=document.getElementById("popup");
+const sound=document.getElementById("sound");
+
+// LOAD SAVED STATE
+items.forEach((item,i)=>{
+  if(localStorage.getItem("item"+i)==="done"){
+    item.classList.add("checked");
+  }
+
+  item.onclick=()=>{
+    item.classList.toggle("checked");
+    sound.play();
+    localStorage.setItem("item"+i,item.classList.contains("checked")?"done":"");
+
+    const done=[...items].every(i=>i.classList.contains("checked"));
+    if(done){
+      setTimeout(()=>popup.style.display="flex",500);
+    }
+  }
+});
+
+// COLOR SAVE
+function setColor(color){
+  document.documentElement.style.setProperty("--main",color);
+  localStorage.setItem("theme",color);
+}
+
+const savedColor=localStorage.getItem("theme");
+if(savedColor) setColor(savedColor);
+</script>
+
+</body>
+</html>
+
